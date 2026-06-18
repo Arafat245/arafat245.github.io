@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Daily Strength Plan</title>
+<style>
+  :root{
+    --paper:#F3EFE6;
+    --card:#FFFFFF;
+    --ink:#23231F;
+    --muted:#6E695F;
+    --line:#E2DBCD;
+    --nourish:#36694F;      /* food / green */
+    --nourish-soft:#E7EFE8;
+    --move:#B5662A;         /* exercise / amber */
+    --move-soft:#F4E7D8;
+    --focus:#1F5FA8;
+  }
+
+  *{box-sizing:border-box;}
+
+  html{-webkit-text-size-adjust:100%;}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:840px;
+    margin:0 auto;
+    padding:32px 20px 64px;
+  }
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-size:.72rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:Georgia,"Times New Roman",serif;
+    font-weight:700;
+    font-size:clamp(2rem,7vw,3rem);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin:0 0 14px;
+  }
+  .lede{
+    font-size:1.05rem;
+    color:var(--muted);
+    max-width:54ch;
+    margin:0;
+  }
+
+  /* ---------- section heads ---------- */
+  .section{margin-top:56px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:8px;
+  }
+  .section-head h2{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:1.7rem;
+    margin:0;
+    font-weight:700;
+  }
+  .section-head .tag{
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .tag.food{background:var(--nourish-soft);color:var(--nourish);}
+  .tag.move{background:var(--move-soft);color:var(--move);}
+
+  .section-note{
+    color:var(--muted);
+    font-size:.96rem;
+    margin:12px 0 26px;
+    max-width:60ch;
+  }
+
+  /* ---------- food timeline ---------- */
+  .timeline{
+    position:relative;
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:23px;
+    top:8px;
+    bottom:8px;
+    width:2px;
+    background:linear-gradient(var(--nourish),#cdbf9a);
+  }
+  @media (max-width:560px){
+    .timeline::before{left:19px;}
+  }
+
+  .meal{
+    position:relative;
+    display:flex;
+    gap:18px;
+    padding:14px 0;
+    align-items:flex-start;
+  }
+  .dot{
+    position:relative;
+    z-index:1;
+    flex:0 0 auto;
+    width:48px;height:48px;
+    border-radius:50%;
+    background:var(--card);
+    border:2px solid var(--nourish);
+    display:flex;align-items:center;justify-content:center;
+  }
+  @media (max-width:560px){
+    .dot{width:40px;height:40px;}
+  }
+  .dot svg{width:30px;height:30px;}
+
+  .meal-body{flex:1 1 auto;padding-top:2px;}
+  .meal-when{
+    font-size:.74rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--nourish);
+    margin:0 0 2px;
+  }
+  .meal-title{
+    font-weight:700;
+    font-size:1.08rem;
+    margin:0 0 4px;
+  }
+  .meal-detail{margin:0;color:var(--muted);font-size:.95rem;}
+  .meal-detail .qty{color:var(--ink);font-weight:600;}
+
+  /* food icon strip */
+  .foods-strip{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;
+  }
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--nourish-soft);
+    border:1px solid #d6e3d8;
+    border-radius:999px;
+    padding:5px 11px 5px 6px;
+    font-size:.82rem;font-weight:600;color:#2c5642;
+  }
+  .chip svg{width:22px;height:22px;}
+
+  /* ---------- principle callouts ---------- */
+  .callout{
+    margin-top:28px;
+    border-radius:14px;
+    padding:18px 20px;
+    display:flex;gap:14px;align-items:flex-start;
+    font-size:.96rem;
+  }
+  .callout.food{background:var(--nourish-soft);border:1px solid #cfe0d2;}
+  .callout.move{background:var(--move-soft);border:1px solid #ecd6bd;}
+  .callout strong{display:block;margin-bottom:3px;}
+  .callout .mark{
+    flex:0 0 auto;width:30px;height:30px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-weight:800;
+  }
+  .callout.food .mark{background:var(--nourish);color:#fff;}
+  .callout.move .mark{background:var(--move);color:#fff;}
+
+  /* ---------- exercise grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(248px,1fr));
+    gap:16px;
+  }
+  .ex{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    display:flex;flex-direction:column;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .ex:hover{transform:translateY(-2px);box-shadow:0 10px 24px -16px rgba(60,40,10,.5);}
+
+  .ex-illus{
+    background:var(--move-soft);
+    border-radius:12px;
+    height:118px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:14px;
+  }
+  .ex-illus svg{width:140px;height:96px;}
+
+  .ex-name{font-weight:700;font-size:1.12rem;margin:0 0 2px;}
+  .ex-works{font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--move);font-weight:700;margin:0 0 10px;}
+
+  .ex dl{margin:0;font-size:.9rem;}
+  .ex dt{font-weight:700;color:var(--ink);margin-top:8px;}
+  .ex dd{margin:1px 0 0;color:var(--muted);}
+
+  .ex-do{
+    margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .ex-do .reps{font-size:.9rem;font-weight:600;color:var(--ink);}
+  .ex-do .reps span{color:var(--muted);font-weight:400;}
+
+  .donebtn{
+    border:1.5px solid var(--move);
+    background:transparent;
+    color:var(--move);
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:.8rem;font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    white-space:nowrap;
+    transition:background .15s ease,color .15s ease;
+  }
+  .donebtn:hover{background:var(--move-soft);}
+  .ex.is-done .donebtn{background:var(--move);color:#fff;}
+  .ex.is-done .ex-illus{opacity:.55;}
+
+  /* ---------- footer ---------- */
+  .footer{
+    margin-top:52px;
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    color:var(--muted);
+    font-size:.9rem;
+  }
+  .footer p{margin:0 0 8px;}
+
+  a{color:var(--focus);}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px;}
+
+  /* ---------- motion ---------- */
+  .reveal{opacity:0;transform:translateY(14px);animation:rise .6s ease forwards;}
+  @keyframes rise{to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{animation:none;opacity:1;transform:none;}
+    .ex{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="reveal">
+    <p class="eyebrow">Daily plan &middot; build basic strength</p>
+    <h1>Eat steady, move a little, get stronger.</h1>
+    <p class="lede">A simple day you can repeat using food you already buy and exercises that need no gym. The aim is a little strength and easy, comfortable eating &mdash; nothing extreme, nothing extra to spend.</p>
+  </header>
+
+  <!-- ============ FOOD ============ -->
+  <section class="section reveal" style="animation-delay:.05s">
+    <div class="section-head">
+      <h2>The day, meal by meal</h2>
+      <span class="tag food">Food</span>
+    </div>
+    <p class="section-note">Five small touch-points across the day. Spreading food out means more total nourishment without any single meal feeling heavy.</p>
+
+    <ul class="timeline">
+
+      <li class="meal">
+        <span class="dot" aria-hidden="true">
+          <!-- sunrise -->
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="58" r="20" fill="#f0b429"/><g stroke="#36694f" stroke-width="5" stroke-linecap="round"><line x1="50" y1="20" x2="50" y2="30"/><line x1="22" y1="32" x2="29" y2="39"/><line x1="78" y1="32" x2="71" y2="39"/></g><line x1="14" y1="78" x2="86" y2="78" stroke="#36694f" stroke-width="5" stroke-linecap="round"/></svg>
+        </span>
+        <div class="meal-body">
+          <p class="meal-when">After waking</p>
+          <p class="meal-title">Banana, a slice of cake, a glass of milk</p>
+          <p class="meal-detail"><span class="qty">1 banana &middot; 1 slice walnut-banana cake &middot; 1 glass milk.</span> An easy, filling start with some protein from the milk.</p>
+          <div class="foods-strip">
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M25 30 C20 55 40 78 70 72 C82 70 84 58 80 55 C70 64 40 60 38 30 C38 26 28 25 25 30Z" fill="#f4c430" stroke="#caa01f" stroke-width="2"/><path d="M25 30 C24 27 27 25 30 27" stroke="#7a5a12" stroke-width="3" fill="none" stroke-linecap="round"/></svg>Banana</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M20 70 L50 30 L80 70 Z" fill="#e7c79a" stroke="#b89360" stroke-width="2"/><path d="M28 60 L72 60" stroke="#c98b4a" stroke-width="4"/><circle cx="50" cy="40" r="5" fill="#7a5230"/></svg>Cake</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M34 24 H66 L62 78 H38 Z" fill="#fff" stroke="#bdb6a6" stroke-width="2"/><path d="M36 40 H64" stroke="#e8e4d8" stroke-width="0"/><rect x="36" y="38" width="28" height="40" fill="#f4f1e8"/></svg>Milk</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="meal">
+        <span class="dot" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="22" ry="28" fill="#fff" stroke="#36694f" stroke-width="4"/><circle cx="50" cy="56" r="11" fill="#f3b53f"/></svg>
+        </span>
+        <div class="meal-body">
+          <p class="meal-when">Mid-morning</p>
+          <p class="meal-title">A boiled egg or a handful of peanuts</p>
+          <p class="meal-detail"><span class="qty">1&ndash;2 eggs, or one small handful of peanuts.</span> A light protein top-up between meals &mdash; no cooking needed.</p>
+          <div class="foods-strip">
+            <span class="chip"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="26" ry="33" fill="#fff" stroke="#bdb6a6" stroke-width="2"/><circle cx="50" cy="56" r="14" fill="#f3b53f"/></svg>Egg</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M30 35 q-8 12 0 22 q-8 12 4 20 q12 6 20-4 q12 4 18-8 q6-14-6-22 q4-14-10-18 q-16-4-26 10Z" fill="#d8a96b" stroke="#a9804a" stroke-width="2"/><circle cx="42" cy="46" r="2.4" fill="#8a6238"/><circle cx="58" cy="58" r="2.4" fill="#8a6238"/></svg>Peanuts</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="meal">
+        <span class="dot" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="32" ry="12" fill="#fff" stroke="#36694f" stroke-width="4"/><path d="M40 54 q10-10 20 0" fill="none" stroke="#36694f" stroke-width="4" stroke-linecap="round"/></svg>
+        </span>
+        <div class="meal-body">
+          <p class="meal-when">Lunch</p>
+          <p class="meal-title">Rice and chicken, plus a small bowl of dal</p>
+          <p class="meal-detail"><span class="qty">Your usual plate of rice &middot; a good piece of chicken &middot; a small bowl of dal.</span> Eat to comfortable, not full. Dal adds cheap, easy protein.</p>
+          <div class="foods-strip">
+            <span class="chip"><svg viewBox="0 0 100 100"><ellipse cx="50" cy="64" rx="34" ry="14" fill="#fff" stroke="#bdb6a6" stroke-width="2"/><path d="M28 58 q22-16 44 0" fill="#f4f1e6" stroke="#d9d2bf" stroke-width="2"/><path d="M58 44 q10 2 12 12 q-10 0-14-6Z" fill="#cf8f54" stroke="#a9703a" stroke-width="2"/></svg>Rice + chicken</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M22 50 a28 22 0 0 0 56 0 Z" fill="#e7a92e" stroke="#b9832a" stroke-width="2"/><ellipse cx="50" cy="50" rx="28" ry="8" fill="#f0bf52"/></svg>Dal</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="meal">
+        <span class="dot" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M34 30 H66 L62 74 H38 Z" fill="#fff" stroke="#36694f" stroke-width="4"/><rect x="40" y="40" width="20" height="30" fill="#f3eee2"/></svg>
+        </span>
+        <div class="meal-body">
+          <p class="meal-when">Afternoon</p>
+          <p class="meal-title">Milk, yogurt, or peanut butter on bread</p>
+          <p class="meal-detail"><span class="qty">Pick one: 1 glass milk &middot; 1 cup yogurt &middot; or peanut butter on a slice of bread.</span> Liquids and spreads add nourishment without feeling heavy.</p>
+          <div class="foods-strip">
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M34 24 H66 L62 78 H38 Z" fill="#fff" stroke="#bdb6a6" stroke-width="2"/><rect x="36" y="38" width="28" height="40" fill="#f4f1e8"/></svg>Milk</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M30 38 H70 L65 74 H35 Z" fill="#fff" stroke="#bdb6a6" stroke-width="2"/><ellipse cx="50" cy="40" rx="20" ry="6" fill="#f1ede2"/><rect x="62" y="20" width="5" height="24" rx="2" fill="#b59a6a" transform="rotate(12 64 32)"/></svg>Yogurt</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M26 44 q0-18 24-18 q24 0 24 18 v18 q0 8-8 8 H34 q-8 0-8-8Z" fill="#e7c79a" stroke="#b89360" stroke-width="2"/><path d="M30 50 q20-8 40 0 v6 q-20-6-40 0Z" fill="#9c6b3b"/></svg>PB toast</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="meal">
+        <span class="dot" aria-hidden="true">
+          <!-- moon -->
+          <svg viewBox="0 0 100 100"><path d="M64 24 a30 30 0 1 0 12 52 a24 24 0 0 1-12-52Z" fill="#3a6b52"/></svg>
+        </span>
+        <div class="meal-body">
+          <p class="meal-when">Dinner</p>
+          <p class="meal-title">Rice and tuna with a vegetable</p>
+          <p class="meal-detail"><span class="qty">Rice (a smaller scoop is fine if appetite is low) &middot; tuna &middot; any vegetable you have.</span> The vegetable covers fibre and the nutrients the rest of the day misses.</p>
+          <div class="foods-strip">
+            <span class="chip"><svg viewBox="0 0 100 100"><path d="M22 50 q14-14 40-12 l-8-8 18 14 -18 14 8-8 q-26 2-40-6Z" fill="#9fb6c4" stroke="#6f8896" stroke-width="2"/><circle cx="40" cy="48" r="2.5" fill="#3f5663"/></svg>Tuna</span>
+            <span class="chip"><svg viewBox="0 0 100 100"><circle cx="40" cy="40" r="12" fill="#4e8a3a"/><circle cx="58" cy="38" r="11" fill="#5a9a44"/><circle cx="50" cy="54" r="12" fill="#468034"/><rect x="46" y="58" width="8" height="20" rx="3" fill="#6f8f4a"/></svg>Vegetable</span>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+
+    <div class="callout food">
+      <span class="mark" aria-hidden="true">&#10003;</span>
+      <div>
+        <strong>The one rule that matters</strong>
+        Smaller amounts, more often. Always eat to comfortably satisfied &mdash; never to the point of discomfort. Appetite grows slowly over the weeks, so there is no need to push or force anything.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXERCISE ============ -->
+  <section class="section reveal" style="animation-delay:.1s">
+    <div class="section-head">
+      <h2>Five moves for basic strength</h2>
+      <span class="tag move">Exercise</span>
+    </div>
+    <p class="section-note">Each move trains one major pattern of the body. Together they cover everything you need &mdash; no machines, no long routine. Tap a card to mark it done for the day.</p>
+
+    <div class="grid">
+
+      <!-- push -->
+      <article class="ex" tabindex="0" role="button" aria-pressed="false">
+        <div class="ex-illus" aria-hidden="true">
+          <svg viewBox="0 0 140 96">
+            <line x1="10" y1="80" x2="130" y2="80" stroke="#b5662a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="36" cy="46" r="9" fill="#23231f"/>
+            <path d="M44 50 L96 64" stroke="#23231f" stroke-width="9" stroke-linecap="round"/>
+            <path d="M96 64 L118 76" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M44 50 L40 76" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M70 57 L66 78" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="ex-name">Push-ups</h3>
+        <p class="ex-works">Chest &middot; shoulders &middot; arms</p>
+        <dl>
+          <dt>Start easy</dt>
+          <dd>Hands on a table or wall; drop to your knees if a full one is too hard.</dd>
+          <dt>Progress</dt>
+          <dd>Full push-ups on the floor, then feet slightly raised.</dd>
+        </dl>
+        <div class="ex-do">
+          <span class="reps">2&ndash;3 sets &middot; <span>about 8&ndash;12 reps</span></span>
+          <button class="donebtn" type="button">Mark done</button>
+        </div>
+      </article>
+
+      <!-- squat -->
+      <article class="ex" tabindex="0" role="button" aria-pressed="false">
+        <div class="ex-illus" aria-hidden="true">
+          <svg viewBox="0 0 140 96">
+            <line x1="10" y1="84" x2="130" y2="84" stroke="#b5662a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="70" cy="24" r="9" fill="#23231f"/>
+            <path d="M70 33 L70 56" stroke="#23231f" stroke-width="9" stroke-linecap="round"/>
+            <path d="M70 56 L52 60 L54 82" stroke="#23231f" stroke-width="7" stroke-linecap="round" fill="none"/>
+            <path d="M70 56 L88 60 L86 82" stroke="#23231f" stroke-width="7" stroke-linecap="round" fill="none"/>
+            <path d="M70 40 L92 44" stroke="#23231f" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="ex-name">Squats</h3>
+        <p class="ex-works">Thighs &middot; hips</p>
+        <dl>
+          <dt>Start easy</dt>
+          <dd>Bodyweight squats &mdash; sit your hips back as if reaching for a chair.</dd>
+          <dt>Progress</dt>
+          <dd>Lunges, then hold a backpack loaded with books or bottles.</dd>
+        </dl>
+        <div class="ex-do">
+          <span class="reps">2&ndash;3 sets &middot; <span>about 10&ndash;15 reps</span></span>
+          <button class="donebtn" type="button">Mark done</button>
+        </div>
+      </article>
+
+      <!-- row -->
+      <article class="ex" tabindex="0" role="button" aria-pressed="false">
+        <div class="ex-illus" aria-hidden="true">
+          <svg viewBox="0 0 140 96">
+            <line x1="10" y1="84" x2="130" y2="84" stroke="#b5662a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="44" cy="34" r="9" fill="#23231f"/>
+            <path d="M50 40 L92 48" stroke="#23231f" stroke-width="9" stroke-linecap="round"/>
+            <path d="M92 48 L96 82" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M70 44 L72 66" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <rect x="64" y="64" width="16" height="12" rx="2" fill="#b5662a"/>
+            <path d="M70 44 L66 66" stroke="#23231f" stroke-width="3" stroke-dasharray="2 3"/>
+          </svg>
+        </div>
+        <h3 class="ex-name">Rows (pull)</h3>
+        <p class="ex-works">Back &middot; arms</p>
+        <dl>
+          <dt>Start easy</dt>
+          <dd>Lie under a sturdy table and pull your chest to the edge, or bend over and pull a loaded bag to your ribs.</dd>
+          <dt>Progress</dt>
+          <dd>Pull-ups, if you have a bar or strong branch.</dd>
+        </dl>
+        <div class="ex-do">
+          <span class="reps">2&ndash;3 sets &middot; <span>about 8&ndash;12 reps</span></span>
+          <button class="donebtn" type="button">Mark done</button>
+        </div>
+      </article>
+
+      <!-- bridge -->
+      <article class="ex" tabindex="0" role="button" aria-pressed="false">
+        <div class="ex-illus" aria-hidden="true">
+          <svg viewBox="0 0 140 96">
+            <line x1="10" y1="84" x2="130" y2="84" stroke="#b5662a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="34" cy="74" r="9" fill="#23231f"/>
+            <path d="M42 74 L74 50" stroke="#23231f" stroke-width="9" stroke-linecap="round"/>
+            <path d="M74 50 L98 70" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M98 70 L100 82" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="ex-name">Glute bridges</h3>
+        <p class="ex-works">Hips &middot; lower back &middot; hamstrings</p>
+        <dl>
+          <dt>Start easy</dt>
+          <dd>Lie on your back, feet flat, and lift your hips into a straight line.</dd>
+          <dt>Progress</dt>
+          <dd>One leg at a time, the other held out straight.</dd>
+        </dl>
+        <div class="ex-do">
+          <span class="reps">2&ndash;3 sets &middot; <span>about 12&ndash;15 reps</span></span>
+          <button class="donebtn" type="button">Mark done</button>
+        </div>
+      </article>
+
+      <!-- plank -->
+      <article class="ex" tabindex="0" role="button" aria-pressed="false">
+        <div class="ex-illus" aria-hidden="true">
+          <svg viewBox="0 0 140 96">
+            <line x1="10" y1="80" x2="130" y2="80" stroke="#b5662a" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="34" cy="52" r="9" fill="#23231f"/>
+            <path d="M42 56 L104 66" stroke="#23231f" stroke-width="9" stroke-linecap="round"/>
+            <path d="M42 56 L40 74" stroke="#23231f" stroke-width="6" stroke-linecap="round"/>
+            <path d="M104 66 L118 76" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M104 66 L104 76" stroke="#23231f" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="ex-name">Plank</h3>
+        <p class="ex-works">Core &middot; whole midsection</p>
+        <dl>
+          <dt>Start easy</dt>
+          <dd>Hold a straight line on forearms and toes &mdash; rest on your knees to begin.</dd>
+          <dt>Progress</dt>
+          <dd>Longer holds, then side planks.</dd>
+        </dl>
+        <div class="ex-do">
+          <span class="reps">2&ndash;3 holds &middot; <span>as long as form stays clean</span></span>
+          <button class="donebtn" type="button">Mark done</button>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="callout move">
+      <span class="mark" aria-hidden="true">&#9651;</span>
+      <div>
+        <strong>How to run it</strong>
+        Two or three days a week, with a rest day in between &mdash; muscle rebuilds during rest and sleep. Warm up with a few minutes of easy movement, keep your form clean, stop a rep or two before you cannot continue, and stop anything that causes sharp or joint pain.
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>The strength comes from doing this regularly and slowly adding a little &mdash; one more rep, or a harder version. The food simply supports the recovery; you do not need anything special or expensive.</p>
+    <p>This is general guidance, not medical or coaching advice. Ease in gently and let your body set the pace. If eating still feels uncomfortable over time, it is worth mentioning to a regular doctor.</p>
+  </footer>
+
+</div>
+
+<script>
+  // Tap / keyboard to mark an exercise done for the day. In-memory only.
+  document.querySelectorAll('.ex').forEach(function(card){
+    function toggle(){
+      var on = card.classList.toggle('is-done');
+      card.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var btn = card.querySelector('.donebtn');
+      if(btn) btn.textContent = on ? 'Done' : 'Mark done';
+    }
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+    });
+  });
+</script>
+</body>
+</html>
